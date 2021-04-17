@@ -161,7 +161,7 @@ impl Account {
 
         let request = build_signed_request(parameters, self.recv_window)?;
         self.client
-            .get_signed::<Empty>(API::Spot(Spot::OrderTest), Some(request))
+            .get_signed::<Empty, _>(API::Spot(Spot::OrderTest), Some(request))
             .map(|_|())
     }
 
@@ -205,7 +205,7 @@ impl Account {
         let order = self.build_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
 
@@ -249,7 +249,7 @@ impl Account {
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
 
@@ -293,7 +293,7 @@ impl Account {
         let order = self.build_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
 
@@ -339,7 +339,7 @@ impl Account {
         let order = self.build_quote_quantity_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
 
@@ -383,7 +383,7 @@ impl Account {
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-        .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+        .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
         .map(|_|())
     }
 
@@ -429,7 +429,7 @@ impl Account {
         let order = self.build_quote_quantity_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-        .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+        .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
         .map(|_|())
     }
 
@@ -513,7 +513,7 @@ impl Account {
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
 
@@ -597,7 +597,7 @@ impl Account {
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
     
@@ -661,7 +661,7 @@ impl Account {
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Spot(Spot::OrderTest), request)
+            .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
 
@@ -690,7 +690,7 @@ impl Account {
         parameters.insert("orderId".into(), order_id.to_string());
         let request = build_signed_request(parameters, self.recv_window)?;
         self.client
-            .delete_signed::<Empty>(API::Spot(Spot::OrderTest), Some(request))
+            .delete_signed::<Empty, _>(API::Spot(Spot::OrderTest), Some(request))
             .map(|_|())
     }
 
