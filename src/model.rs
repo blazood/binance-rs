@@ -321,6 +321,15 @@ pub struct TradeHistory {
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
+pub struct DepositAddress {
+    pub url: String,
+    pub address_tag: String,
+    pub address: String,
+    pub asset: String
+}
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
 pub struct PriceStats {
     pub symbol: String,
     pub price_change: String,

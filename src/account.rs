@@ -1,3 +1,5 @@
+use chrono::Local;
+
 use crate::util::*;
 use crate::model::*;
 use crate::client::*;
@@ -692,6 +694,15 @@ impl Account {
         self.client
             .delete_signed::<Empty, _>(API::Spot(Spot::OrderTest), Some(request))
             .map(|_|())
+    }
+
+    pub fn deposit_address<S>(&self, asset: S) -> Result<DepositAddress> 
+    where S: Into<String>
+    {
+        let mut parameters: BTreeMap<String, String> = BTreeMap::new();
+        parameters.insert("asset".into(), asset.into());
+        parameters.insert("timestamp".into(), Local::now().timestamp_millis().to_string());
+        self.client.get_signed(API::Spot(Spot::DepositAddress), Some(build_request(parameters)))
     }
 
     // Trade history

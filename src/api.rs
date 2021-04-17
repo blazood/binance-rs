@@ -40,6 +40,7 @@ pub enum Spot {
     Account,
     MyTrades,
     UserDataStream,
+    DepositAddress,
 }
 
 pub enum Futures {
@@ -98,6 +99,7 @@ impl From<API> for String {
                     Spot::Account => "/api/v3/account",
                     Spot::MyTrades => "/api/v3/myTrades",
                     Spot::UserDataStream => "/api/v3/userDataStream",
+                    Spot::DepositAddress => "/wapi/v3/depositAddress.html",
                 }
             },
             API::Futures(route) => {
