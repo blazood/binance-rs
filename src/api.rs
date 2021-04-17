@@ -2,6 +2,7 @@ use crate::account::*;
 use crate::config::*;
 use crate::market::*;
 use crate::general::*;
+use crate::lending::*;
 use crate::futures::general::*;
 use crate::futures::market::*;
 use crate::userstream::*;
@@ -40,7 +41,6 @@ pub enum Spot {
     Account,
     MyTrades,
     UserDataStream,
-    DepositAddress,
 }
 
 pub enum Futures {
@@ -99,7 +99,6 @@ impl From<API> for String {
                     Spot::Account => "/api/v3/account",
                     Spot::MyTrades => "/api/v3/myTrades",
                     Spot::UserDataStream => "/api/v3/userDataStream",
-                    Spot::DepositAddress => "/wapi/v3/depositAddress.html",
                 }
             },
             API::Futures(route) => {
@@ -152,6 +151,21 @@ impl Binance for General {
     ) -> General {
         General {
             client: Client::new(api_key, secret_key, config.rest_api_endpoint.clone()),
+        }
+    }
+}
+
+impl Binance for Lending {
+    fn new(api_key: Option<String>, secret_key: Option<String>) -> Lending {
+        Self::new_with_config(api_key, secret_key, &Config::default())
+    }
+
+    fn new_with_config(
+        api_key: Option<String>, secret_key: Option<String>, config: &Config,
+    ) -> Lending {
+        Lending {
+            client: Client::new(api_key, secret_key, config.rest_api_endpoint.clone()),
+            recv_window: config.recv_window,
         }
     }
 }

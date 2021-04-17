@@ -25,7 +25,6 @@ error-chain = { version = "0.12.4", default-features = false }
 reqwest = { version = "0.10.9", features = ["blocking", "json"] }
 tungstenite = "0.11.1"
 url = "2.2.0"
-chrono = { version = "0.4", features = ["serde"]}
 
 [features]
 vendored-tls = ["reqwest/native-tls-vendored", "tungstenite/tls-vendored"]
