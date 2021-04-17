@@ -1,15 +1,14 @@
 [package]
-name = "binance"
-version = "0.13.0"
+name = "binance-client"
+version = "0.1.0"
 license = "MIT OR Apache-2.0"
-authors = ["Flavio Oliveira <flavio@wisespace.io>"]
+authors = ["blazh <blazh@163.com>"]
 edition = "2018"
 
-description = "Rust Library for the Binance API"
+description = "Rust Library for the Binance API. fork from binance-rs"
 keywords = ["cryptocurrency", "trading", "binance"]
 categories = ["api-bindings", "cryptography::cryptocurrencies"]
-documentation = "https://docs.rs/crate/binance/"
-repository = "https://github.com/wisespace-io/binance-rs"
+repository = "https://github.com/blazood/binance-rs"
 readme = "README.md"
 
 [badges]
