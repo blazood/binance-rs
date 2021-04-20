@@ -821,17 +821,17 @@ pub(crate) mod string_or_float {
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct LendingAccountPositionAmount {
-    amount: String,
+    pub amount: String,
     #[serde(rename = "amountInBTC")]
-    amount_in_btc: String,
+    pub amount_in_btc: String,
     #[serde(rename = "amountInUSDT")]
-    amount_in_usdt: String,
-    asset: String,
+    pub amount_in_usdt: String,
+    pub asset: String,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
 #[serde(rename_all = "camelCase")]
 pub struct LendingAccount {
-    position_amount_vos: Vec<LendingAccountPositionAmount>,
+    pub position_amount_vos: Vec<LendingAccountPositionAmount>,
 
 }
