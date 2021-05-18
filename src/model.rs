@@ -219,18 +219,13 @@ pub struct Bids {
     pub price: f64,
     #[serde(with = "string_or_float")]
     pub qty: f64,
-
-    // Never serialized.
-    #[serde(skip)]
-    ignore: Vec<String>,
 }
 
 impl Bids {
     pub fn new(price: f64, qty: f64) -> Bids {
         Bids { 
             price, 
-            qty, 
-            ignore: vec!(),
+            qty,
         }
     }
 }
@@ -241,10 +236,6 @@ pub struct Asks {
     pub price: f64,
     #[serde(with = "string_or_float")]
     pub qty: f64,
-
-    // Never serialized.
-    #[serde(skip)]
-    ignore: Vec<String>,
 }
 
 #[derive(Debug, Serialize, Deserialize, Clone)]
@@ -779,6 +770,9 @@ pub struct DepthOrderBookEvent {
     #[serde(rename = "u")]
     pub final_update_id: u64,
 
+    #[serde(rename = "pu")]
+    pub previous_final_update_id: u64,
+
     #[serde(rename = "b")]
     pub bids: Vec<Bids>,
 
@@ -833,5 +827,35 @@ pub struct LendingAccountPositionAmount {
 #[serde(rename_all = "camelCase")]
 pub struct LendingAccount {
     pub position_amount_vos: Vec<LendingAccountPositionAmount>,
+}
 
+pub(crate) mod string_or_float_opt {
+    use std::fmt;
+
+    use serde::{Serializer, Deserialize, Deserializer};
+
+    pub fn serialize<T, S>(value: &Option<T>, serializer: S) -> Result<S::Ok, S::Error>
+    where
+        T: fmt::Display,
+        S: Serializer,
+    {
+        match value {
+            Some(v) => crate::model::string_or_float::serialize(v, serializer),
+            None => serializer.serialize_none()
+        }
+    }
+
+    pub fn deserialize<'de, D>(deserializer: D) -> Result<Option<f64>, D::Error>
+    where
+        D: Deserializer<'de>,
+    {
+        #[derive(Deserialize)]
+        #[serde(untagged)]
+        enum StringOrFloat {
+            String(String),
+            Float(f64),
+        }
+
+        Ok(Some(crate::model::string_or_float::deserialize(deserializer)?))
+    }
 }
