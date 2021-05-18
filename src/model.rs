@@ -829,6 +829,30 @@ pub struct LendingAccount {
     pub position_amount_vos: Vec<LendingAccountPositionAmount>,
 }
 
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct IsolatedAccountAsset  {
+    pub asset: String,
+    borrow_enabled: bool,
+    borrowed: String,
+    free: String,
+    interest: String,
+    locked: String,
+    net_asset: String,
+    net_asset_of_btc: String,
+    repay_enabled: bool,
+    total_asset: String,
+}
+
+
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+#[serde(rename_all = "camelCase")]
+pub struct IsolatedAccount  {
+    pub position_amount_vos: Vec<LendingAccountPositionAmount>,
+}
+
+
 pub(crate) mod string_or_float_opt {
     use std::fmt;
 

@@ -27,3 +27,5 @@ pub mod websockets;
 
 pub mod futures;
 pub mod lending;
+pub mod blvt;
+pub mod margin;

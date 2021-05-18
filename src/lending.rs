@@ -15,9 +15,10 @@ pub struct Lending {
 
 
 impl Lending {
+    /// 账户的余额
     pub fn get_account(&self) -> Result<LendingAccount> {
         let mut parameters: BTreeMap<String, String> = BTreeMap::new();
         parameters.insert("timestamp".into(), get_now_timestamp().unwrap().to_string());
-        self.client.get_signed::<LendingAccount, _>("/sapi/v1/lending/union/account", Some(build_request(parameters)))
+        self.client.get_signed("/sapi/v1/lending/union/account", Some(build_request(parameters)))
     }
 }

@@ -279,7 +279,7 @@ impl FuturesAccount {
 
         let request = build_signed_request(parameters, self.recv_window)?;
         self.client
-            .post_signed::<Empty>(API::Futures(Futures::PositionSide), request)
+            .post_signed::<Empty, _>(API::Futures(Futures::PositionSide), request)
             .map(|_| ())
     }
 
@@ -288,7 +288,7 @@ impl FuturesAccount {
         parameters.insert("symbol".into(), symbol.into());
         let request = build_signed_request(parameters, self.recv_window)?;
         self.client
-            .delete_signed::<Empty>(API::Futures(Futures::AllOpenOrders), Some(request))
+            .delete_signed::<Empty, _>(API::Futures(Futures::AllOpenOrders), Some(request))
             .map(|_| ())
     }
 }
