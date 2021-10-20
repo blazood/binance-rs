@@ -21,6 +21,7 @@ struct OrderRequest {
     pub order_side: OrderSide,
     pub order_type: OrderType,
     pub time_in_force: TimeInForce,
+    pub new_client_order_id: Option<String>,
 }
 
 struct OrderQuoteQuantityRequest {
@@ -30,6 +31,7 @@ struct OrderQuoteQuantityRequest {
     pub order_side: OrderSide,
     pub order_type: OrderType,
     pub time_in_force: TimeInForce,
+    pub new_client_order_id: Option<String>,
 }
 
 pub enum OrderType {
@@ -180,6 +182,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::Limit,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
@@ -202,6 +205,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::Limit,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
@@ -224,6 +228,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::Limit,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -246,6 +251,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::Limit,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -268,6 +274,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
@@ -290,6 +297,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
@@ -313,6 +321,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_quote_quantity_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
@@ -336,6 +345,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_quote_quantity_order(buy);
         let request = build_signed_request(order, self.recv_window)?;
@@ -358,6 +368,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -380,6 +391,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -403,6 +415,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_quote_quantity_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -426,6 +439,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::Market,
             time_in_force: TimeInForce::GTC,
+            new_client_order_id: None,
         };
         let order = self.build_quote_quantity_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -434,9 +448,9 @@ impl Account {
         .map(|_|())
     }
 
-    /// Create a stop limit buy order for the given symbol, price and stop price. 
+    /// Create a stop limit buy order for the given symbol, price and stop price.
     /// Returning a `Transaction` value with the same parameters sent on the order.
-    /// 
+    ///
     ///```no_run
     /// use binance::api::Binance;
     /// use binance::account::*;
@@ -468,17 +482,18 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::StopLossLimit,
             time_in_force,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client.post_signed(API::Spot(Spot::Order), request)
     }
 
-    /// Create a stop limit buy test order for the given symbol, price and stop price. 
+    /// Create a stop limit buy test order for the given symbol, price and stop price.
     /// Returning a `Transaction` value with the same parameters sent on the order.
-    /// 
+    ///
     /// This order is sandboxed: it is validated, but not sent to the matching engine.
-    /// 
+    ///
     ///```no_run
     /// use binance::api::Binance;
     /// use binance::account::*;
@@ -510,6 +525,7 @@ impl Account {
             order_side: OrderSide::Buy,
             order_type: OrderType::StopLossLimit,
             time_in_force,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -518,9 +534,9 @@ impl Account {
             .map(|_|())
     }
 
-    /// Create a stop limit sell order for the given symbol, price and stop price. 
+    /// Create a stop limit sell order for the given symbol, price and stop price.
     /// Returning a `Transaction` value with the same parameters sent on the order.
-    /// 
+    ///
     ///```no_run
     /// use binance::api::Binance;
     /// use binance::account::*;
@@ -552,17 +568,18 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::StopLossLimit,
             time_in_force,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
         self.client.post_signed(API::Spot(Spot::Order), request)
     }
 
-    /// Create a stop limit sell order for the given symbol, price and stop price. 
+    /// Create a stop limit sell order for the given symbol, price and stop price.
     /// Returning a `Transaction` value with the same parameters sent on the order.
-    /// 
+    ///
     /// This order is sandboxed: it is validated, but not sent to the matching engine.
-    /// 
+    ///
     ///```no_run
     /// use binance::api::Binance;
     /// use binance::account::*;
@@ -594,6 +611,7 @@ impl Account {
             order_side: OrderSide::Sell,
             order_type: OrderType::StopLossLimit,
             time_in_force,
+            new_client_order_id: None,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -601,9 +619,9 @@ impl Account {
             .post_signed::<Empty, _>(API::Spot(Spot::OrderTest), request)
             .map(|_|())
     }
-    
+
     /// Place a custom order
-    #[allow(clippy::too_many_arguments)] 
+    #[allow(clippy::too_many_arguments)]
     pub fn custom_order<S, F>(
         &self,
         symbol: S,
@@ -613,6 +631,7 @@ impl Account {
         order_side: OrderSide,
         order_type: OrderType,
         time_in_force: TimeInForce,
+        new_client_order_id : Option<String>,
     ) -> Result<Transaction>
     where
         S: Into<String>,
@@ -626,6 +645,7 @@ impl Account {
             order_side,
             order_type,
             time_in_force,
+            new_client_order_id,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -635,7 +655,7 @@ impl Account {
     /// Place a test custom order
     ///
     /// This order is sandboxed: it is validated, but not sent to the matching engine.
-    #[allow(clippy::too_many_arguments)] 
+    #[allow(clippy::too_many_arguments)]
     pub fn test_custom_order<S, F>(
         &self,
         symbol: S,
@@ -645,6 +665,7 @@ impl Account {
         order_side: OrderSide,
         order_type: OrderType,
         time_in_force: TimeInForce,
+        new_client_order_id : Option<String>,
     ) -> Result<()>
     where
         S: Into<String>,
@@ -658,6 +679,7 @@ impl Account {
             order_side,
             order_type,
             time_in_force,
+            new_client_order_id,
         };
         let order = self.build_order(sell);
         let request = build_signed_request(order, self.recv_window)?;
@@ -679,6 +701,18 @@ impl Account {
         self.client.delete_signed(API::Spot(Spot::Order), Some(request))
     }
 
+    pub fn cancel_order_with_client_id<S>(&self, symbol: S, orig_client_order_id: String) -> Result<OrderCanceled>
+    where
+        S: Into<String>
+    {
+        let mut parameters: BTreeMap<String, String> = BTreeMap::new();
+        parameters.insert("symbol".into(), symbol.into());
+        parameters.insert("origClientOrderId".into(), orig_client_order_id);
+
+        let request = build_signed_request(parameters, self.recv_window)?;
+        self.client.delete_signed(API::Spot(Spot::Order), Some(request))
+        
+    }
     /// Place a test cancel order
     ///
     /// This order is sandboxed: it is validated, but not sent to the matching engine.
@@ -733,6 +767,10 @@ impl Account {
             order_parameters.insert("timeInForce".into(), order.time_in_force.into());
         }
 
+        if let Some(client_order_id) = order.new_client_order_id {
+            order_parameters.insert("newClientOrderId".into(), client_order_id);
+        }
+
         order_parameters
     }
 
@@ -749,6 +787,10 @@ impl Account {
         if order.price != 0.0 {
             order_parameters.insert("price".into(), order.price.to_string());
             order_parameters.insert("timeInForce".into(), order.time_in_force.into());
+        }
+
+        if let Some(client_order_id) = order.new_client_order_id {
+            order_parameters.insert("newClientOrderId".into(), client_order_id);
         }
 
         order_parameters

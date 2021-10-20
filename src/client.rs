@@ -121,14 +121,14 @@ impl Client {
         let endpoint:String = endpoint.into();
         match request {
             Some(request) => {
-                let mut signed_key = Hmac::<Sha256>::new_varkey(self.secret_key.as_bytes()).unwrap();
+                let mut signed_key = Hmac::<Sha256>::new_from_slice(self.secret_key.as_bytes()).unwrap();
                 signed_key.update(request.as_bytes());
                 let signature = hex_encode(signed_key.finalize().into_bytes());
                 let request_body: String = format!("{}&signature={}", request, signature);
                 format!("{}{}?{}", self.host, endpoint, request_body)
             },
             None => {
-                let signed_key = Hmac::<Sha256>::new_varkey(self.secret_key.as_bytes()).unwrap();
+                let signed_key = Hmac::<Sha256>::new_from_slice(self.secret_key.as_bytes()).unwrap();
                 let signature = hex_encode(signed_key.finalize().into_bytes());
                 let request_body: String = format!("&signature={}", signature);
                 format!("{}{}?{}", self.host, endpoint, request_body)

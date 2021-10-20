@@ -6,7 +6,7 @@ use crate::client::Client;
 use crate::api::{API, Futures};
 use crate::model::Empty;
 use crate::account::{OrderSide, TimeInForce};
-use super::model::{ChangeLeverageResponse, Transaction};
+use super::model::{ChangeLeverageResponse, Transaction, CanceledOrder, Position, AccountBalance};
 
 
 #[derive(Clone)]
@@ -164,7 +164,7 @@ impl FuturesAccount {
     }
 
     // Place a MARKET order - BUY
-    pub fn market_buy<S, F>(&self, symbol: S, qty: F, time_in_force: TimeInForce) -> Result<Transaction>
+    pub fn market_buy<S, F>(&self, symbol: S, qty: F) -> Result<Transaction>
     where
         S: Into<String>,
         F: Into<f64>,
@@ -174,7 +174,7 @@ impl FuturesAccount {
             side: OrderSide::Buy,
             position_side: None,
             order_type: OrderType::Market,
-            time_in_force: Some(time_in_force),
+            time_in_force: None,
             qty: Some(qty.into()),
             reduce_only: None,
             price: None,
@@ -191,7 +191,7 @@ impl FuturesAccount {
     }
 
     // Place a MARKET order - SELL
-    pub fn market_sell<S, F>(&self, symbol: S, qty: F, time_in_force: TimeInForce) -> Result<Transaction>
+    pub fn market_sell<S, F>(&self, symbol: S, qty: F) -> Result<Transaction>
     where
         S: Into<String>,
         F: Into<f64>,
@@ -201,12 +201,78 @@ impl FuturesAccount {
             side: OrderSide::Sell,
             position_side: None,
             order_type: OrderType::Market,
-            time_in_force: Some(time_in_force),
+            time_in_force: None,
             qty: Some(qty.into()),
             reduce_only: None,
             price: None,
             stop_price: None,
             close_position: None,
+            activation_price: None,
+            callback_rate: None,
+            working_type: None,
+            price_protect: None,
+        };
+        let order = self.build_order(sell);
+        let request = build_signed_request(order, self.recv_window)?;
+        self.client.post_signed(API::Futures(Futures::Order), request)
+    }
+
+    pub fn cancel_order<S>(&self, symbol: S, order_id: u64) -> Result<CanceledOrder> 
+    where 
+        S: Into<String>
+    {
+        let mut parameters = BTreeMap::new();
+        parameters.insert("symbol".into(), symbol.into());
+        parameters.insert("orderId".into(), order_id.to_string());
+        
+        let request = build_signed_request(parameters, self.recv_window)?;
+        self.client.delete_signed(API::Futures(Futures::Order), Some(request))
+    }
+
+    // Place a STOP_MARKET close - BUY
+    pub fn stop_market_close_buy<S, F>(&self, symbol: S, stop_price: F) -> Result<Transaction>
+        where
+            S: Into<String>,
+            F: Into<f64>,
+    {
+        let sell: OrderRequest = OrderRequest {
+            symbol: symbol.into(),
+            side: OrderSide::Buy,
+            position_side: None,
+            order_type: OrderType::StopMarket,
+            time_in_force: None,
+            qty: None,
+            reduce_only: None,
+            price: None,
+            stop_price: Some(stop_price.into()),
+            close_position: Some(true),
+            activation_price: None,
+            callback_rate: None,
+            working_type: None,
+            price_protect: None,
+        };
+        let order = self.build_order(sell);
+        let request = build_signed_request(order, self.recv_window)?;
+        self.client.post_signed(API::Futures(Futures::Order), request)
+    }
+
+    // Place a STOP_MARKET close - SELL
+    pub fn stop_market_close_sell<S, F>(&self, symbol: S, stop_price: F) -> Result<Transaction>
+        where
+            S: Into<String>,
+            F: Into<f64>,
+    {
+        let sell: OrderRequest = OrderRequest {
+            symbol: symbol.into(),
+            side: OrderSide::Sell,
+            position_side: None,
+            order_type: OrderType::StopMarket,
+            time_in_force: None,
+            qty: None,
+            reduce_only: None,
+            price: None,
+            stop_price: Some(stop_price.into()),
+            close_position: Some(true),
             activation_price: None,
             callback_rate: None,
             working_type: None,
@@ -260,6 +326,23 @@ impl FuturesAccount {
         parameters
     }
 
+    pub fn position_information<S>(&self, symbol: S) -> Result<Vec<Position>>
+        where S: Into<String>
+    {
+        let mut parameters = BTreeMap::new();
+        parameters.insert("symbol".into(), symbol.into());
+
+        let request = build_signed_request(parameters, self.recv_window)?;
+        self.client.get_signed(API::Futures(Futures::PositionRisk), Some(request))
+    }
+
+    pub fn account_balance(&self) -> Result<Vec<AccountBalance>> {
+        let parameters = BTreeMap::new();
+
+        let request = build_signed_request(parameters, self.recv_window)?;
+        self.client.get_signed(API::Futures(Futures::Balance), Some(request))
+    }
+
     pub fn change_initial_leverage<S>(&self, symbol: S, leverage: u8) -> Result<ChangeLeverageResponse>
     where
         S: Into<String>
@@ -279,7 +362,7 @@ impl FuturesAccount {
 
         let request = build_signed_request(parameters, self.recv_window)?;
         self.client
-            .post_signed::<Empty, _>(API::Futures(Futures::PositionSide), request)
+            .post_signed::<Empty, API>(API::Futures(Futures::PositionSide), request)
             .map(|_| ())
     }
 
@@ -288,7 +371,14 @@ impl FuturesAccount {
         parameters.insert("symbol".into(), symbol.into());
         let request = build_signed_request(parameters, self.recv_window)?;
         self.client
-            .delete_signed::<Empty, _>(API::Futures(Futures::AllOpenOrders), Some(request))
+            .delete_signed::<Empty, API>(API::Futures(Futures::AllOpenOrders), Some(request))
             .map(|_| ())
+    }
+
+    pub fn get_all_open_orders<S>(&self, symbol: S) -> Result<Vec<crate::futures::model::Order>> where S: Into<String> {
+        let mut parameters: BTreeMap<String, String> = BTreeMap::new();
+        parameters.insert("symbol".into(), symbol.into());
+        let request = build_signed_request(parameters, self.recv_window)?;
+        self.client.get_signed(API::Futures(Futures::OpenOrders), Some(request))
     }
 }
