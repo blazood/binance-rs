@@ -5,9 +5,10 @@ use url::Url;
 use serde::{Deserialize, Serialize};
 
 use std::sync::atomic::{AtomicBool, Ordering};
+use std::net::TcpStream;
 use tungstenite::{connect, Message};
 use tungstenite::protocol::WebSocket;
-use tungstenite::client::AutoStream;
+use tungstenite::stream::MaybeTlsStream;
 use tungstenite::handshake::client::Response;
 
 #[allow(clippy::all)]
@@ -23,7 +24,7 @@ impl WebsocketAPI {
         match self {
             WebsocketAPI::Default => format!("wss://stream.binance.com:9443/ws/{}", subscription),
             WebsocketAPI::MultiStream => format!("wss://stream.binance.com:9443/stream?streams={}", subscription),
-            WebsocketAPI::Custom(url) => url,
+            WebsocketAPI::Custom(url) => format!("{}/{}", url, subscription),
         }
     }
 
@@ -45,10 +46,8 @@ pub enum WebsocketEvent {
 }
 
 pub struct WebSockets<'a> {
-    pub socket: Option<(WebSocket<AutoStream>, Response)>,
+    pub socket: Option<(WebSocket<MaybeTlsStream<TcpStream>>, Response)>,
     handler: Box<dyn FnMut(WebsocketEvent) -> Result<()> + 'a>,
-    #[allow(dead_code)]
-    subscription: &'a str,
 }
 
 #[derive(Serialize, Deserialize, Debug)]
@@ -75,35 +74,21 @@ impl<'a> WebSockets<'a> {
         WebSockets {
             socket: None,
             handler: Box::new(handler),
-            subscription: "",
         }
     }
 
-    pub fn new_with_subscription<Callback>(subscription: &'a str, handler: Callback) -> WebSockets<'a>
-    where
-        Callback: FnMut(WebsocketEvent) -> Result<()> + 'a,
-    {
-        WebSockets {
-            socket: None,
-            handler: Box::new(handler),
-            subscription,
-        }
-    }
-
-    pub fn connect(&mut self, subscription: &'a str) -> Result<()> {
-        self.subscription = subscription;
+    pub fn connect(&mut self, subscription: &str) -> Result<()> {
         self.connect_wss(WebsocketAPI::Default.params(subscription))
     }
 
-    pub fn connect_with_config(&mut self, subscription: &'a str, config: &'a Config) -> Result<()> {
-        self.subscription = subscription;
+    pub fn connect_with_config(&mut self, subscription: &str, config: &Config) -> Result<()> {
         self.connect_wss(WebsocketAPI::Custom(config.ws_endpoint.clone()).params(subscription))
     }
 
     pub fn connect_multiple_streams(&mut self, endpoints: &[String]) -> Result<()> {
         self.connect_wss(WebsocketAPI::MultiStream.params(&endpoints.join("/")))
     }
-
+    
     fn connect_wss(&mut self, wss: String) -> Result<()> {
         let url = Url::parse(&wss)?;
         match connect(url) {

@@ -16,7 +16,7 @@ impl Config {
             ws_endpoint: "wss://stream.binance.com:9443/ws/".into(),
 
             futures_rest_api_endpoint: "https://fapi.binance.com".into(),
-            futures_ws_endpoint: "wss://fstream.binance.com".into(),
+            futures_ws_endpoint: "wss://fstream.binance.com/ws".into(),
 
             recv_window: 5000,
         }
@@ -24,9 +24,9 @@ impl Config {
 
     pub fn testnet() -> Config {
         Config::default()
-            .set_rest_api_endpoint("https://testnet.binance.vision/api")
+            .set_rest_api_endpoint("https://testnet.binance.vision")
             .set_ws_endpoint("wss://testnet.binance.vision/ws")
-            .set_futures_rest_api_endpoint("https://testnet.binancefuture.com/api")
+            .set_futures_rest_api_endpoint("https://testnet.binancefuture.com")
             .set_futures_ws_endpoint("https://testnet.binancefuture.com/ws")
     }
 
