@@ -10,10 +10,12 @@ use crate::futures::market::*;
 use crate::general::*;
 use crate::market::*;
 use crate::userstream::*;
+use crate::savings::*;
 
 #[allow(clippy::all)]
 pub enum API {
     Spot(Spot),
+    Savings(Sapi),
     Futures(Futures),
 }
 
@@ -46,6 +48,12 @@ pub enum Spot {
     UserDataStream,
 }
 
+pub enum Sapi {
+    AllCoins,
+    AssetDetail,
+    DepositAddress,
+}
+
 pub enum Futures {
     Ping,
     Time,
@@ -66,6 +74,8 @@ pub enum Futures {
     AllForceOrders,
     AllOpenOrders,
     Order,
+    PositionRisk,
+    Balance,
     PositionSide,
     OpenInterest,
     OpenInterestHist,
@@ -76,6 +86,8 @@ pub enum Futures {
     LvtKlines,
     IndexInfo,
     ChangeInitialLeverage,
+    Account,
+    OpenOrders,
 }
 
 impl From<API> for String {
@@ -108,6 +120,13 @@ impl From<API> for String {
                     Spot::UserDataStream => "/api/v3/userDataStream",
                 }
             },
+            API::Savings(route) => {
+                match route {
+                    Sapi::AllCoins => "/sapi/v1/capital/config/getall",
+                    Sapi::AssetDetail => "/sapi/v1/asset/assetDetail",
+                    Sapi::DepositAddress => "/sapi/v1/capital/deposit/address",
+                }
+            },
             API::Futures(route) => {
                 match route {
                     Futures::Ping => "/fapi/v1/ping",
@@ -130,6 +149,8 @@ impl From<API> for String {
                     Futures::AllOpenOrders => "/fapi/v1/allOpenOrders",
                     Futures::PositionSide => "/fapi/v1/positionSide/dual",
                     Futures::Order => "/fapi/v1/order",
+                    Futures::PositionRisk => "/fapi/v2/positionRisk",
+                    Futures::Balance => "/fapi/v2/balance",
                     Futures::OpenInterest => "/fapi/v1/openInterest",
                     Futures::OpenInterestHist => "/futures/data/openInterestHist",
                     Futures::TopLongShortAccountRatio => "/futures/data/topLongShortAccountRatio",
@@ -139,6 +160,8 @@ impl From<API> for String {
                     Futures::LvtKlines => "/fapi/v1/lvtKlines",
                     Futures::IndexInfo => "/fapi/v1/indexInfo",
                     Futures::ChangeInitialLeverage => "/fapi/v1/leverage",
+                    Futures::Account => "/fapi/v2/account",
+                    Futures::OpenOrders => "/fapi/v1/openOrders"
                 }
             }
         })
@@ -190,6 +213,21 @@ impl Binance for Account {
         api_key: Option<String>, secret_key: Option<String>, config: &Config,
     ) -> Account {
         Account {
+            client: Client::new(api_key, secret_key, config.rest_api_endpoint.clone()),
+            recv_window: config.recv_window,
+        }
+    }
+}
+
+impl Binance for Savings {
+    fn new(api_key: Option<String>, secret_key: Option<String>) -> Self {
+        Self::new_with_config(api_key, secret_key, &Config::default())
+    }
+
+    fn new_with_config(
+        api_key: Option<String>, secret_key: Option<String>, config: &Config,
+    ) -> Self {
+        Self {
             client: Client::new(api_key, secret_key, config.rest_api_endpoint.clone()),
             recv_window: config.recv_window,
         }

@@ -190,6 +190,12 @@ impl FuturesMarket {
         self.client.get(API::Futures(Futures::Ticker24hr), Some(request))
     }
 
+    // 24hr ticker price change statistics for all symbols
+    pub fn get_all_24h_price_stats(&self) -> Result<Vec<PriceStats>>
+    {
+        self.client.get(API::Futures(Futures::Ticker24hr), None)
+    }
+
     // Latest price for ONE symbol.
     pub fn get_price<S>(&self, symbol: S) -> Result<SymbolPrice>
     where
@@ -201,6 +207,12 @@ impl FuturesMarket {
         let request = build_request(parameters);
 
         self.client.get(API::Futures(Futures::TickerPrice), Some(request))
+    }
+    
+    // Latest price for all symbols.
+    pub fn get_all_prices(&self) -> Result<crate::model::Prices>
+    {
+        self.client.get(API::Futures(Futures::TickerPrice), None)
     }
 
     // Symbols order book ticker
